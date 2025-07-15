@@ -3,15 +3,15 @@
 body {
   font-family: 'Roboto Mono', monospace;
   margin: 0;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #4facfe 75%, #667eea 100%);
+  background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 50%, #e8f5e9 100%);
   background-size: 400% 400%;
-  animation: gradientShift 15s ease infinite;
+  animation: materialGradientShift 20s ease infinite;
   min-height: 100vh;
   position: relative;
   overflow-x: hidden;
 }
 
-@keyframes gradientShift {
+@keyframes materialGradientShift {
   0% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
@@ -25,9 +25,9 @@ body::before {
   width: 100%;
   height: 100%;
   background: 
-    radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
-    radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
-    radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.2) 0%, transparent 50%);
+    radial-gradient(circle at 25% 25%, rgba(66, 165, 245, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 75% 75%, rgba(186, 104, 200, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 50% 50%, rgba(129, 199, 132, 0.05) 0%, transparent 50%);
   pointer-events: none;
   z-index: -1;
 }
@@ -40,17 +40,17 @@ body::after {
   width: 100%;
   height: 100%;
   background-image: 
-    linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
-  background-size: 50px 50px;
+    linear-gradient(rgba(25, 118, 210, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(25, 118, 210, 0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
   pointer-events: none;
   z-index: -1;
-  animation: gridMove 20s linear infinite;
+  animation: materialGridMove 25s linear infinite;
 }
 
-@keyframes gridMove {
+@keyframes materialGridMove {
   0% { transform: translate(0, 0); }
-  100% { transform: translate(50px, 50px); }
+  100% { transform: translate(40px, 40px); }
 }
 
 .el-container {
@@ -60,11 +60,11 @@ body::after {
 }
 
 .main-header {
-  background-color: #1da1f2;
+  background: linear-gradient(135deg, #1976d2 0%, #42a5f5 100%);
   color: white;
   text-align: center;
   padding: 50px 20px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 20px rgba(25, 118, 210, 0.3);
   overflow: hidden;
   position: relative;
   z-index: 1;
@@ -77,11 +77,29 @@ body::after {
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(45deg, #1da1f2, #007bff, #6a0dad);
-  opacity: 0.7;
+  background: linear-gradient(45deg, #1976d2, #2196f3, #64b5f6);
+  opacity: 0.8;
   z-index: -1;
-  animation: geometricTransform 10s infinite alternate ease-in-out;
+  animation: materialHeaderTransform 12s infinite alternate ease-in-out;
   transform-origin: center center;
+}
+
+@keyframes materialHeaderTransform {
+  0% {
+    transform: scale(1) rotate(0deg) skew(0deg);
+  }
+  25% {
+    transform: scale(1.02) rotate(1deg) skew(0.5deg);
+  }
+  50% {
+    transform: scale(1) rotate(0deg) skew(0deg);
+  }
+  75% {
+    transform: scale(0.98) rotate(-1deg) skew(-0.5deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg) skew(0deg);
+  }
 }
 
 @keyframes geometricTransform {
@@ -124,10 +142,13 @@ body::after {
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #4facfe 75%, #667eea 100%);
-  opacity: 0.1;
+  background: 
+    radial-gradient(circle at 30% 70%, rgba(66, 165, 245, 0.08) 0%, transparent 60%),
+    radial-gradient(circle at 70% 30%, rgba(186, 104, 200, 0.08) 0%, transparent 60%),
+    radial-gradient(circle at 50% 50%, rgba(129, 199, 132, 0.05) 0%, transparent 60%);
+  opacity: 1;
   z-index: 0;
-  animation: contentGeometricTransform 15s infinite linear;
+  animation: materialContentTransform 18s infinite ease-in-out;
 }
 
 @keyframes contentGeometricTransform {

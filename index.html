@@ -3,8 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MicroLog</title>
+    <title>MicroLog_Lab</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    
     <style>
+        :root {
+            /* 明亮极客配色方案 */
+            --bg-color: #f7f9fc; /* 极淡的蓝灰色背景 */
+            --grid-color: rgba(0, 0, 0, 0.04); /* 方格线颜色 */
+            --card-bg: #ffffff;
+            --text-main: #1a202c; /* 深灰几近黑 */
+            --text-secondary: #718096;
+            --accent-primary: #2563eb; /* 科技蓝 (类似 VS Code 选中色) */
+            --accent-secondary: #f59e0b; /* 警告橙 */
+            --code-bg: #f1f5f9;
+            --border-color: #e2e8f0;
+            
+            --font-mono: 'Fira Code', 'Consolas', monospace;
+            --font-sans: 'Inter', -apple-system, sans-serif;
+            
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -12,391 +36,383 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-            color: #424242;
+            font-family: var(--font-sans);
+            background-color: var(--bg-color);
+            color: var(--text-main);
             line-height: 1.6;
             min-height: 100vh;
-            background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
             position: relative;
-            overflow-x: hidden;
+            /* 背景方格纸效果 */
+            background-image: 
+                linear-gradient(var(--grid-color) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+            background-size: 24px 24px; /* 格子大小 */
         }
 
-        /* 动态几何背景 */
-        .bg-animation {
+        /* 画布作为背景层，用于绘制动态几何连线 */
+        #canvas-bg {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             z-index: -1;
-            overflow: hidden;
+            pointer-events: none;
         }
 
-        .geometric-shape {
-            position: absolute;
-            opacity: 0.4;
-            animation: float 20s infinite linear;
-        }
-
-        .shape-1 {
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(45deg, #7986cb, #5c6bc0);
-            border-radius: 50%;
-            top: 20%;
-            left: 10%;
-            animation-delay: 0s;
-        }
-
-        .shape-2 {
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(45deg, #ff8a65, #ff7043);
-            transform: rotate(45deg);
-            top: 60%;
-            right: 15%;
-            animation-delay: -5s;
-        }
-
-        .shape-3 {
-            width: 100px;
-            height: 100px;
-            background: linear-gradient(45deg, #81c784, #66bb6a);
-            border-radius: 30%;
-            top: 80%;
-            left: 20%;
-            animation-delay: -10s;
-        }
-
-        .shape-4 {
-            width: 70px;
-            height: 70px;
-            background: linear-gradient(45deg, #ffb74d, #ffa726);
-            border-radius: 50% 0 50% 0;
-            top: 30%;
-            right: 30%;
-            animation-delay: -15s;
-        }
-
-        .shape-5 {
-            width: 50px;
-            height: 80px;
-            background: linear-gradient(45deg, #64b5f6, #42a5f5);
-            border-radius: 50px;
-            top: 10%;
-            left: 60%;
-            animation-delay: -7s;
-        }
-
-        @keyframes float {
-            0% {
-                transform: translateY(0px) rotate(0deg);
-            }
-            25% {
-                transform: translateY(-20px) rotate(90deg);
-            }
-            50% {
-                transform: translateY(-40px) rotate(180deg);
-            }
-            75% {
-                transform: translateY(-20px) rotate(270deg);
-            }
-            100% {
-                transform: translateY(0px) rotate(360deg);
-            }
-        }
-
-        /* 主容器 */
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 2rem;
-            position: relative;
-            z-index: 1;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 3rem;
-            padding: 2rem;
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 3rem;
-            padding: 3rem 2rem;
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 24px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .header::before {
-            content: '';
-            position: absolute;
+        /* 顶部进度条装饰 */
+        .top-bar {
+            position: fixed;
             top: 0;
             left: 0;
-            right: 0;
+            width: 100%;
             height: 4px;
-            background: linear-gradient(90deg, #1976d2, #42a5f5, #7986cb, #ba68c8);
+            background: linear-gradient(90deg, var(--accent-primary), #60a5fa);
+            z-index: 100;
         }
 
-        .header-content {
+        .container {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 3rem 1.5rem;
+        }
+
+        /* Header 设计：类似实验报告/文档头部 */
+        .header {
+            margin-bottom: 4rem;
             position: relative;
-            z-index: 1;
+        }
+
+        .header-badge {
+            display: inline-block;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--accent-primary);
+            background: rgba(37, 99, 235, 0.1);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            border: 1px solid rgba(37, 99, 235, 0.2);
         }
 
         .header h1 {
             font-size: 3rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, #1976d2, #7e57c2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            color: var(--text-main);
             margin-bottom: 0.5rem;
-            letter-spacing: -1px;
         }
 
-        .header-subtitle {
-            font-size: 1.125rem;
-            color: #757575;
-            font-weight: 400;
-            margin-bottom: 1.5rem;
+        .header h1 span.dot {
+            color: var(--accent-primary);
         }
 
-        .header-stats {
+        .header-meta {
             display: flex;
-            justify-content: center;
             gap: 2rem;
-            margin-top: 1.5rem;
-        }
-
-        .stat-item {
-            text-align: center;
-            padding: 0.5rem 1rem;
-            background: rgba(25, 118, 210, 0.08);
-            border-radius: 12px;
-            transition: all 0.3s ease;
-        }
-
-        .stat-item:hover {
-            background: rgba(25, 118, 210, 0.12);
-            transform: translateY(-2px);
-        }
-
-        .stat-number {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: #1976d2;
-            display: block;
-        }
-
-        .stat-label {
+            font-family: var(--font-mono);
             font-size: 0.875rem;
-            color: #757575;
-            margin-top: 0.25rem;
+            color: var(--text-secondary);
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 2px solid var(--border-color);
         }
 
-        .header-decoration {
-            position: absolute;
-            width: 200px;
-            height: 200px;
-            background: radial-gradient(circle, rgba(25, 118, 210, 0.1) 0%, transparent 70%);
-            border-radius: 50%;
-            top: -50px;
-            right: -50px;
-            z-index: 0;
-        }
-
-        .header-decoration::before {
-            content: '';
-            position: absolute;
-            width: 120px;
-            height: 120px;
-            background: radial-gradient(circle, rgba(126, 87, 194, 0.08) 0%, transparent 70%);
-            border-radius: 50%;
-            bottom: -30px;
-            left: -30px;
-        }
-
-        .posts-container {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-
-        .post {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 2rem;
-            border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .post::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-            transition: left 0.5s;
-        }
-
-        .post:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-        }
-
-        .post:hover::before {
-            left: 100%;
-        }
-
-        .post-date {
-            font-size: 0.875rem;
-            color: #757575;
-            margin-bottom: 1rem;
-            font-weight: 500;
+        .meta-item {
             display: flex;
             align-items: center;
             gap: 0.5rem;
         }
+        
+        .meta-item::before {
+            content: '';
+            display: block;
+            width: 6px;
+            height: 6px;
+            background-color: var(--accent-secondary);
+            border-radius: 50%;
+        }
 
-        .post-date::before {
-            content: '•';
-            color: #1976d2;
-            font-size: 1.2rem;
+        /* 文章卡片：干净的实验室风格 */
+        .posts-container {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .post {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* 悬停效果：上浮 + 阴影加深 + 边框高亮 */
+        .post:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-hover);
+            border-color: var(--accent-primary);
+        }
+
+        /* 装饰性角标 */
+        .post::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 0 40px 40px 0;
+            border-color: transparent rgba(37, 99, 235, 0.05) transparent transparent;
+            transition: border-color 0.3s;
+        }
+
+        .post:hover::before {
+            border-color: transparent var(--accent-primary) transparent transparent;
+        }
+
+        .post-header {
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .post-date {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            background: var(--code-bg);
+            padding: 0.25rem 0.75rem;
+            border-radius: 999px;
         }
 
         .post-content {
-            font-size: 1.125rem;
-            line-height: 1.75;
-            color: #212121;
+            color: var(--text-main);
+            font-size: 1.05rem;
+            line-height: 1.8;
         }
 
-        .post-content p {
-            margin: 0.75em 0;
+        /* 极客风格的 Markdown 样式 */
+        .post-content p { margin-bottom: 1em; }
+
+        /* 代码块样式 - 类似 Github Light */
+        .post-content code {
+            font-family: var(--font-mono);
+            background-color: rgba(37, 99, 235, 0.08);
+            color: var(--accent-primary);
+            padding: 0.1em 0.3em;
+            border-radius: 4px;
+            font-size: 0.9em;
         }
 
-        .post-content ul, .post-content ol {
-            margin: 0.75em 0 0.75em 1.5em;
+        .post-content pre {
+            background-color: #f8fafc;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.25rem;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            font-size: 0.9rem;
         }
 
         .post-content blockquote {
-            border-left: 4px solid #1976d2;
-            padding-left: 1.5rem;
-            margin: 1rem 0;
-            color: #424242;
-            font-style: italic;
-            background: rgba(25, 118, 210, 0.05);
+            border-left: 4px solid var(--accent-secondary);
+            background: #fffaf0;
+            margin: 1.5rem 0;
             padding: 1rem 1.5rem;
+            color: #4a5568;
+            font-style: italic;
+        }
+
+        .post-content a {
+            color: var(--accent-primary);
+            text-decoration: none;
+            font-weight: 600;
+            border-bottom: 2px solid rgba(37, 99, 235, 0.2);
+            transition: all 0.2s;
+        }
+
+        .post-content a:hover {
+            background: rgba(37, 99, 235, 0.1);
+            border-bottom-color: var(--accent-primary);
+        }
+
+        .post-content img {
+            max-width: 100%;
             border-radius: 8px;
+            border: 1px solid var(--border-color);
+            margin: 1rem 0;
         }
 
         .empty {
             text-align: center;
-            color: #757575;
             padding: 4rem 2rem;
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-            backdrop-filter: blur(10px);
-            font-size: 1.125rem;
+            background: white;
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
+            color: var(--text-secondary);
+            font-family: var(--font-mono);
         }
 
-        /* 响应式设计 */
-        @media (max-width: 768px) {
-            .container {
-                padding: 1rem;
-            }
-            
-            .header h1 {
-                font-size: 2rem;
-            }
-            
-            .post {
-                padding: 1.5rem;
-            }
-        }
-
-        /* 加载动画 */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        /* 动画 */
+        @keyframes slideUpFade {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .post {
-            animation: fadeInUp 0.6s ease-out forwards;
+            animation: slideUpFade 0.5s ease-out forwards;
         }
 
-        .post:nth-child(1) { animation-delay: 0.1s; }
-        .post:nth-child(2) { animation-delay: 0.2s; }
-        .post:nth-child(3) { animation-delay: 0.3s; }
-        .post:nth-child(4) { animation-delay: 0.4s; }
-        .post:nth-child(5) { animation-delay: 0.5s; }
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .container { padding: 2rem 1rem; }
+            .header h1 { font-size: 2.25rem; }
+            .header-meta { flex-direction: column; gap: 0.5rem; }
+        }
     </style>
 </head>
 <body>
-    <!-- 动态几何背景 -->
-    <div class="bg-animation">
-        <div class="geometric-shape shape-1"></div>
-        <div class="geometric-shape shape-2"></div>
-        <div class="geometric-shape shape-3"></div>
-        <div class="geometric-shape shape-4"></div>
-        <div class="geometric-shape shape-5"></div>
-    </div>
+    <div class="top-bar"></div>
+    <canvas id="canvas-bg"></canvas>
 
     <div class="container">
-        <div class="header">
-            <div class="header-decoration"></div>
-            <div class="header-content">
-                <h1>MicroLog</h1>
-                <p class="header-subtitle">记录生活的每一刻</p>
-                <div class="header-stats">
-                    <div class="stat-item">
-                        <span class="stat-number">2</span>
-                        <span class="stat-label">动态</span>
-                    </div>
-                </div>
+        <header class="header">
+            <span class="header-badge">SYSTEM_READY</span>
+            <h1>MicroLog<span class="dot">.</span></h1>
+            <div class="header-meta">
+                <div class="meta-item">USER: admin@localhost</div>
+                <div class="meta-item">ENTRIES: 2</div>
+                <div class="meta-item">MODE: ENGINEERING_LIGHT</div>
             </div>
-        </div>
+        </header>
         
         <div class="posts-container">
             
                 
-                    <div class="post">
+                    <article class="post" style="animation-delay: 0.0s">
                         
-                            <div class="post-date">2025-07-20 22:32</div>
+                            <div class="post-header">
+                                <span class="post-date">2025-07-20 22:32</span>
+                            </div>
                         
                         <div class="post-content"><p>新购买了一个macbook air 16+256😊</p></div>
-                    </div>
+                    </article>
                 
-                    <div class="post">
+                    <article class="post" style="animation-delay: 0.1s">
                         
                         <div class="post-content"><p>hello world!!!</p></div>
-                    </div>
+                    </article>
                 
             
         </div>
     </div>
+
+    <script>
+        // 极客风格背景：明亮版连线网络
+        // 区别于暗黑版，这里的线条颜色更深，更细，像工程制图
+        const canvas = document.getElementById('canvas-bg');
+        const ctx = canvas.getContext('2d');
+        let nodes = [];
+
+        // 颜色配置：使用淡蓝色和灰色
+        const config = {
+            nodeCount: window.innerWidth < 768 ? 30 : 60,
+            connectionDistance: 180,
+            nodeColor: 'rgba(37, 99, 235, 0.15)', // 节点淡蓝
+            lineColor: 'rgba(113, 128, 150, 0.15)', // 线条淡灰
+            moveSpeed: 0.3
+        };
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        class Node {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.vx = (Math.random() - 0.5) * config.moveSpeed;
+                this.vy = (Math.random() - 0.5) * config.moveSpeed;
+                // 随机多边形节点，而不是圆形，更有技术感
+                this.sides = Math.floor(Math.random() * 3) + 3; // 3 to 5 sides
+                this.radius = Math.random() * 3 + 2;
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+
+                if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+                if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+            }
+
+            draw() {
+                ctx.beginPath();
+                // 绘制多边形节点
+                ctx.moveTo(this.x + this.radius * Math.cos(0), this.y + this.radius * Math.sin(0));
+                for (let i = 1; i <= this.sides; i++) {
+                    ctx.lineTo(
+                        this.x + this.radius * Math.cos(i * 2 * Math.PI / this.sides),
+                        this.y + this.radius * Math.sin(i * 2 * Math.PI / this.sides)
+                    );
+                }
+                ctx.fillStyle = config.nodeColor;
+                ctx.fill();
+            }
+        }
+
+        function init() {
+            nodes = [];
+            for (let i = 0; i < config.nodeCount; i++) {
+                nodes.push(new Node());
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            nodes.forEach(node => {
+                node.update();
+                node.draw();
+            });
+
+            // 绘制网格连线
+            for (let i = 0; i < nodes.length; i++) {
+                for (let j = i + 1; j < nodes.length; j++) {
+                    const dx = nodes[i].x - nodes[j].x;
+                    const dy = nodes[i].y - nodes[j].y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+
+                    if (dist < config.connectionDistance) {
+                        ctx.beginPath();
+                        ctx.strokeStyle = config.lineColor;
+                        ctx.lineWidth = 1; // 细线，像工程图纸
+                        ctx.moveTo(nodes[i].x, nodes[i].y);
+                        ctx.lineTo(nodes[j].x, nodes[j].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+
+            requestAnimationFrame(animate);
+        }
+
+        window.addEventListener('resize', () => {
+            resize();
+            init();
+        });
+
+        resize();
+        init();
+        animate();
+    </script>
 </body>
 </html>

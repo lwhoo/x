@@ -3,416 +3,439 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MicroLog_Lab</title>
+    <title>MicroLog</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            /* 明亮极客配色方案 */
-            --bg-color: #f7f9fc; /* 极淡的蓝灰色背景 */
-            --grid-color: rgba(0, 0, 0, 0.04); /* 方格线颜色 */
+            --bg-color: #f8f9fa;
+            --grid-color: rgba(0, 0, 0, 0.05);
             --card-bg: #ffffff;
-            --text-main: #1a202c; /* 深灰几近黑 */
-            --text-secondary: #718096;
-            --accent-primary: #2563eb; /* 科技蓝 (类似 VS Code 选中色) */
-            --accent-secondary: #f59e0b; /* 警告橙 */
-            --code-bg: #f1f5f9;
-            --border-color: #e2e8f0;
-            
+            --text-main: #212529;
+            --text-secondary: #6c757d;
+            --accent-primary: #007bff;
+            --accent-secondary: #fd7e14;
+            --border-color: #dee2e6;
             --font-mono: 'Fira Code', 'Consolas', monospace;
             --font-sans: 'Inter', -apple-system, sans-serif;
-            
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            --shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-sm: 0 1px 3px rgba(0,0,0,.05);
+            --shadow-md: 0 4px 6px rgba(0,0,0,.05);
+            --shadow-hover: 0 10px 15px rgba(0,0,0,.07);
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        body {
-            font-family: var(--font-sans);
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            line-height: 1.6;
-            min-height: 100vh;
-            position: relative;
-            /* 背景方格纸效果 */
-            background-image: 
-                linear-gradient(var(--grid-color) 1px, transparent 1px),
-                linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
-            background-size: 24px 24px; /* 格子大小 */
-        }
-
-        /* 画布作为背景层，用于绘制动态几何连线 */
-        #canvas-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            pointer-events: none;
-        }
-
-        /* 顶部进度条装饰 */
-        .top-bar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 4px;
-            background: linear-gradient(90deg, var(--accent-primary), #60a5fa);
-            z-index: 100;
-        }
-
-        .container {
-            max-width: 720px;
-            margin: 0 auto;
-            padding: 3rem 1.5rem;
-        }
-
-        /* Header 设计：类似实验报告/文档头部 */
-        .header {
-            margin-bottom: 4rem;
-            position: relative;
-        }
-
-        .header-badge {
-            display: inline-block;
-            font-family: var(--font-mono);
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: var(--accent-primary);
-            background: rgba(37, 99, 235, 0.1);
-            padding: 0.25rem 0.5rem;
-            border-radius: 4px;
-            margin-bottom: 1rem;
-            border: 1px solid rgba(37, 99, 235, 0.2);
-        }
-
-        .header h1 {
-            font-size: 3rem;
-            font-weight: 800;
-            letter-spacing: -0.03em;
-            color: var(--text-main);
-            margin-bottom: 0.5rem;
-        }
-
-        .header h1 span.dot {
-            color: var(--accent-primary);
-        }
-
-        .header-meta {
-            display: flex;
-            gap: 2rem;
-            font-family: var(--font-mono);
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-            margin-top: 1rem;
-            padding-top: 1rem;
-            border-top: 2px solid var(--border-color);
-        }
-
-        .meta-item {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
         
-        .meta-item::before {
-            content: '';
-            display: block;
-            width: 6px;
-            height: 6px;
-            background-color: var(--accent-secondary);
-            border-radius: 50%;
-        }
 
-        /* 文章卡片：干净的实验室风格 */
-        .posts-container {
-            display: flex;
-            flex-direction: column;
-            gap: 2rem;
-        }
+                html { scroll-behavior: smooth; }
 
-        .post {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 2rem;
-            box-shadow: var(--shadow-sm);
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-            position: relative;
-            overflow: hidden;
-        }
+        
 
-        /* 悬停效果：上浮 + 阴影加深 + 边框高亮 */
-        .post:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-hover);
-            border-color: var(--accent-primary);
-        }
+                body {
 
-        /* 装饰性角标 */
-        .post::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 0;
-            height: 0;
-            border-style: solid;
-            border-width: 0 40px 40px 0;
-            border-color: transparent rgba(37, 99, 235, 0.05) transparent transparent;
-            transition: border-color 0.3s;
-        }
+                    font-family: var(--font-sans);
 
-        .post:hover::before {
-            border-color: transparent var(--accent-primary) transparent transparent;
-        }
+                    background-color: var(--bg-color);
 
-        .post-header {
-            margin-bottom: 1.25rem;
-            display: flex;
-            align-items: center;
-        }
+                    color: var(--text-main);
 
-        .post-date {
-            font-family: var(--font-mono);
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            background: var(--code-bg);
-            padding: 0.25rem 0.75rem;
-            border-radius: 999px;
-        }
+                    line-height: 1.7;
 
-        .post-content {
-            color: var(--text-main);
-            font-size: 1.05rem;
-            line-height: 1.8;
-        }
+                    background-image: linear-gradient(var(--grid-color) 1px, transparent 1px),
 
-        /* 极客风格的 Markdown 样式 */
-        .post-content p { margin-bottom: 1em; }
+                                      linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
 
-        /* 代码块样式 - 类似 Github Light */
-        .post-content code {
-            font-family: var(--font-mono);
-            background-color: rgba(37, 99, 235, 0.08);
-            color: var(--accent-primary);
-            padding: 0.1em 0.3em;
-            border-radius: 4px;
-            font-size: 0.9em;
-        }
+                    background-size: 20px 20px;
 
-        .post-content pre {
-            background-color: #f8fafc;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 1.25rem;
-            overflow-x: auto;
-            margin: 1.5rem 0;
-            font-size: 0.9rem;
-        }
+                }
 
-        .post-content blockquote {
-            border-left: 4px solid var(--accent-secondary);
-            background: #fffaf0;
-            margin: 1.5rem 0;
-            padding: 1rem 1.5rem;
-            color: #4a5568;
-            font-style: italic;
-        }
+        
 
-        .post-content a {
-            color: var(--accent-primary);
-            text-decoration: none;
-            font-weight: 600;
-            border-bottom: 2px solid rgba(37, 99, 235, 0.2);
-            transition: all 0.2s;
-        }
+                .top-bar {
 
-        .post-content a:hover {
-            background: rgba(37, 99, 235, 0.1);
-            border-bottom-color: var(--accent-primary);
-        }
+                    position: fixed;
 
-        .post-content img {
-            max-width: 100%;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            margin: 1rem 0;
-        }
+                    top: 0; left: 0; width: 100%; height: 4px;
 
-        .empty {
-            text-align: center;
-            padding: 4rem 2rem;
-            background: white;
-            border: 2px dashed var(--border-color);
-            border-radius: 12px;
-            color: var(--text-secondary);
-            font-family: var(--font-mono);
-        }
+                    background: linear-gradient(90deg, var(--accent-primary), #6610f2);
 
-        /* 动画 */
-        @keyframes slideUpFade {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+                    z-index: 1000;
 
-        .post {
-            animation: slideUpFade 0.5s ease-out forwards;
-        }
+                }
 
-        /* 响应式 */
-        @media (max-width: 768px) {
-            .container { padding: 2rem 1rem; }
-            .header h1 { font-size: 2.25rem; }
-            .header-meta { flex-direction: column; gap: 0.5rem; }
-        }
+        
+
+                .page-wrapper {
+
+                    display: flex;
+
+                    max-width: 1200px;
+
+                    margin: 0 auto;
+
+                    padding: 4rem 2rem;
+
+                    gap: 2rem;
+
+                }
+
+        
+
+                .timeline-sidebar {
+
+                    flex: 0 0 220px;
+
+                    position: sticky;
+
+                    top: 4rem;
+
+                    align-self: flex-start;
+
+                    max-height: calc(100vh - 6rem);
+
+                    overflow-y: auto;
+
+                    padding-right: 1rem;
+
+                }
+
+        
+
+                .timeline-nav h3 {
+
+                    font-size: 0.875rem;
+
+                    font-family: var(--font-mono);
+
+                    color: var(--text-secondary);
+
+                    text-transform: uppercase;
+
+                    letter-spacing: 1px;
+
+                    padding-bottom: 0.5rem;
+
+                    border-bottom: 1px solid var(--border-color);
+
+                    margin-bottom: 1rem;
+
+                }
+
+        
+
+                .timeline-year { margin-bottom: 1.5rem; }
+
+                .timeline-year > a {
+
+                    font-size: 1.3rem;
+
+                    font-weight: 800;
+
+                    color: var(--text-main);
+
+                    text-decoration: none;
+
+                    transition: color 0.2s;
+
+                }
+
+                .timeline-year > a:hover { color: var(--accent-primary); }
+
+        
+
+                .timeline-months {
+
+                    list-style: none;
+
+                    margin-top: 0.75rem;
+
+                    padding-left: 0.75rem;
+
+                    border-left: 2px solid var(--border-color);
+
+                }
+
+                .timeline-months li a {
+
+                    display: flex;
+
+                    justify-content: space-between;
+
+                    align-items: center;
+
+                    padding: 0.5rem 0.8rem;
+
+                    font-size: 0.95rem;
+
+                    color: var(--text-secondary);
+
+                    text-decoration: none;
+
+                    border-radius: 4px;
+
+                    transition: all 0.2s ease;
+
+                }
+
+                .timeline-months li a:hover {
+
+                    background-color: rgba(0, 123, 255, 0.05);
+
+                    color: var(--accent-primary);
+
+                    transform: translateX(4px);
+
+                }
+
+                .timeline-month-count {
+
+                    font-family: var(--font-mono);
+
+                    font-size: 0.8rem;
+
+                    background-color: #e9ecef;
+
+                    color: var(--text-secondary);
+
+                    padding: 0.1rem 0.4rem;
+
+                    border-radius: 4px;
+
+                    transition: all 0.2s ease;
+
+                }
+
+                .timeline-months a:hover .timeline-month-count {
+
+                    background-color: var(--accent-primary);
+
+                    color: white;
+
+                }
+
+        
+
+                .main-content { flex: 1 1 auto; min-width: 0; }
+
+                .header { margin-bottom: 3rem; text-align: center; }
+
+                .header h1 { font-size: 3.5rem; font-weight: 800; letter-spacing: -0.04em; }
+
+                .header h1 span.dot { color: var(--accent-primary); }
+
+                .header-subtitle { font-size: 1.15rem; color: var(--text-secondary); margin-top: 0.5rem; }
+
+        
+
+                .posts-container { display: flex; flex-direction: column; gap: 2.5rem; }
+
+        
+
+                .post {
+
+                    display: flex;
+
+                    flex-direction: column;
+
+                    background: var(--card-bg);
+
+                    border: 1px solid var(--border-color);
+
+                    border-radius: 8px;
+
+                    box-shadow: var(--shadow-sm);
+
+                    transition: all 0.3s ease;
+
+                }
+
+                .post:hover {
+
+                    transform: translateY(-3px);
+
+                    box-shadow: var(--shadow-hover);
+
+                    border-color: rgba(0, 123, 255, 0.5);
+
+                }
+
+        
+
+                .post-content {
+
+                    padding: 2rem;
+
+                    font-size: 1.05rem;
+
+                    line-height: 1.8;
+
+                    flex-grow: 1;
+
+                }
+
+                .post-content > *:first-child { margin-top: 0; }
+
+                .post-content > *:last-child { margin-bottom: 0; }
+
+                
+
+                .post-footer {
+
+                    padding: 0.75rem 2rem;
+
+                    border-top: 1px solid var(--border-color);
+
+                    text-align: right;
+
+                    background-color: #fcfdff;
+
+                    border-radius: 0 0 8px 8px;
+
+                }
+
+                .post-date {
+
+                    font-family: var(--font-mono);
+
+                    font-size: 0.85rem;
+
+                    color: var(--text-secondary);
+
+                }
+
+        
+
+                .post-content p { margin-bottom: 1em; }
+
+                .post-content code {
+
+                    font-family: var(--font-mono);
+
+                    background-color: rgba(0, 123, 255, 0.08);
+
+                    color: var(--accent-primary);
+
+                    padding: 0.15em 0.4em;
+
+                    border-radius: 4px;
+
+                    font-size: 0.9em;
+
+                }
+
+                .post-content pre {
+
+                    background-color: #f1f3f5;
+
+                    border: 1px solid var(--border-color);
+
+                    border-radius: 6px; padding: 1rem;
+
+                    overflow-x: auto; margin: 1.5rem 0; font-size: 0.9rem;
+
+                }
+
+                .post-content blockquote {
+
+                    border-left: 4px solid var(--accent-secondary);
+
+                    background: #fff9f2; margin: 1.5rem 0;
+
+                    padding: 1rem 1.5rem; color: #58412c;
+
+                }
+
+                .post-content a {
+
+                    color: var(--accent-primary); font-weight: 600;
+
+                    text-decoration: none; border-bottom: 2px solid transparent;
+
+                    transition: border-color 0.2s;
+
+                }
+
+                .post-content a:hover { border-bottom-color: var(--accent-primary); }
+
+                .post-content img {
+
+                    max-width: 100%; height: auto;
+
+                    border-radius: 6px; margin: 1.2rem 0;
+
+                }
+
+        
+
+                .empty {
+
+                    text-align: center; padding: 4rem 2rem;
+
+                    background: var(--card-bg); border: 2px dashed var(--border-color);
+
+                    border-radius: 12px; color: var(--text-secondary);
+
+                    font-family: var(--font-mono);
+
+                }
+
+        
+
+                @media (max-width: 992px) {
+
+                    .page-wrapper { flex-direction: column; }
+
+                    .timeline-sidebar {
+
+                        position: static; flex: 1; max-height: none;
+
+                        order: -1; margin-bottom: 2rem; padding-right: 0;
+
+                    }
+
+                }
+
+                @media (max-width: 768px) {
+
+                    .page-wrapper { padding: 3rem 1rem; }
+
+                    .header h1 { font-size: 2.5rem; }
+
+                    .post-content { padding: 1.5rem; }
+
+                    .post-footer { padding: 0.75rem 1.5rem; }
+
+                }
     </style>
 </head>
 <body>
     <div class="top-bar"></div>
-    <canvas id="canvas-bg"></canvas>
 
-    <div class="container">
-        <header class="header">
-            <span class="header-badge">SYSTEM_READY</span>
-            <h1>MicroLog<span class="dot">.</span></h1>
-            <div class="header-meta">
-                <div class="meta-item">USER: admin@localhost</div>
-                <div class="meta-item">ENTRIES: 2</div>
-                <div class="meta-item">MODE: ENGINEERING_LIGHT</div>
+    <div class="page-wrapper">
+        <aside class="timeline-sidebar">
+            <nav class="timeline-nav">
+                <h3>Timeline</h3>
+                
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="header">
+                <h1>MicroLog<span class="dot">.</span></h1>
+                <p class="header-subtitle">A personal microblog.</p>
+            </header>
+            
+            <div class="posts-container">
+                
+                    <div class="empty">
+                        // NO_DATA_FOUND <br>
+                        Waiting for input stream...
+                    </div>
+                
             </div>
-        </header>
-        
-        <div class="posts-container">
-            
-                
-                    <article class="post" style="animation-delay: 0.0s">
-                        
-                            <div class="post-header">
-                                <span class="post-date">2025-07-20 22:32</span>
-                            </div>
-                        
-                        <div class="post-content"><p>新购买了一个macbook air 16+256😊</p></div>
-                    </article>
-                
-                    <article class="post" style="animation-delay: 0.1s">
-                        
-                        <div class="post-content"><p>hello world!!!</p></div>
-                    </article>
-                
-            
-        </div>
+        </main>
     </div>
-
-    <script>
-        // 极客风格背景：明亮版连线网络
-        // 区别于暗黑版，这里的线条颜色更深，更细，像工程制图
-        const canvas = document.getElementById('canvas-bg');
-        const ctx = canvas.getContext('2d');
-        let nodes = [];
-
-        // 颜色配置：使用淡蓝色和灰色
-        const config = {
-            nodeCount: window.innerWidth < 768 ? 30 : 60,
-            connectionDistance: 180,
-            nodeColor: 'rgba(37, 99, 235, 0.15)', // 节点淡蓝
-            lineColor: 'rgba(113, 128, 150, 0.15)', // 线条淡灰
-            moveSpeed: 0.3
-        };
-
-        function resize() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-
-        class Node {
-            constructor() {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height;
-                this.vx = (Math.random() - 0.5) * config.moveSpeed;
-                this.vy = (Math.random() - 0.5) * config.moveSpeed;
-                // 随机多边形节点，而不是圆形，更有技术感
-                this.sides = Math.floor(Math.random() * 3) + 3; // 3 to 5 sides
-                this.radius = Math.random() * 3 + 2;
-            }
-
-            update() {
-                this.x += this.vx;
-                this.y += this.vy;
-
-                if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
-                if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
-            }
-
-            draw() {
-                ctx.beginPath();
-                // 绘制多边形节点
-                ctx.moveTo(this.x + this.radius * Math.cos(0), this.y + this.radius * Math.sin(0));
-                for (let i = 1; i <= this.sides; i++) {
-                    ctx.lineTo(
-                        this.x + this.radius * Math.cos(i * 2 * Math.PI / this.sides),
-                        this.y + this.radius * Math.sin(i * 2 * Math.PI / this.sides)
-                    );
-                }
-                ctx.fillStyle = config.nodeColor;
-                ctx.fill();
-            }
-        }
-
-        function init() {
-            nodes = [];
-            for (let i = 0; i < config.nodeCount; i++) {
-                nodes.push(new Node());
-            }
-        }
-
-        function animate() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            nodes.forEach(node => {
-                node.update();
-                node.draw();
-            });
-
-            // 绘制网格连线
-            for (let i = 0; i < nodes.length; i++) {
-                for (let j = i + 1; j < nodes.length; j++) {
-                    const dx = nodes[i].x - nodes[j].x;
-                    const dy = nodes[i].y - nodes[j].y;
-                    const dist = Math.sqrt(dx * dx + dy * dy);
-
-                    if (dist < config.connectionDistance) {
-                        ctx.beginPath();
-                        ctx.strokeStyle = config.lineColor;
-                        ctx.lineWidth = 1; // 细线，像工程图纸
-                        ctx.moveTo(nodes[i].x, nodes[i].y);
-                        ctx.lineTo(nodes[j].x, nodes[j].y);
-                        ctx.stroke();
-                    }
-                }
-            }
-
-            requestAnimationFrame(animate);
-        }
-
-        window.addEventListener('resize', () => {
-            resize();
-            init();
-        });
-
-        resize();
-        init();
-        animate();
-    </script>
 </body>
 </html>
